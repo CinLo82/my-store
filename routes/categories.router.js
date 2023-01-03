@@ -10,4 +10,6 @@ router.get('/:categoryId/products/:productId', (req, res) => {
   });
 })
 
+
+
 module.exports = router;
