@@ -1,4 +1,5 @@
 const express = require('express');
+const CategoriesService = require('./../services/categories.service');
 
 const router = express.Router();
 
