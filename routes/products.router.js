@@ -6,14 +6,13 @@ const { createProductSchema, updateProductSchema, getProductSchema } = require('
 const router = express.Router();
 const service = new ProductsService();
 
-router.get('/', async (req, res) => {
-const products = await service.find();
-res.json(products);
-});
-
-
-router.get('/filter', (req, res) => {
-  console.log('yo soy un filter');
+router.get('/', async (req, res, next) => {
+  try {
+    const products = await service.find();
+    res.json(products);
+  } catch (error) {
+    next(error);
+  }
 });
 
 
