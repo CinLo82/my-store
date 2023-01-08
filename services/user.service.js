@@ -1,76 +1,39 @@
-const { faker } = require('@faker-js/faker');
+const { models } = require('./../libs/sequelize');
 const boom = require('@hapi/boom');
 
-const getConnection = require('./../libs/postgres');
-
-class UsersService {
-  constructor() {
-    this.users = [];
-    this.generate();
-  }
-
-  generate() {
-    const limit = 5;
-    for (let index = 0; index < limit; index++) {
-      this.users.push({
-        id: faker.datatype.uuid(),
-        name: faker.name.firstName(),
-        lastname: faker.name.lastName(),
-        email: faker.internet.email(),
-      });
-    }
-  }
-
-  async find() {
-    const client = await getConnection();
-    const rta = await client.query('SELECT * FROM tasks');
-    return rta.rows;
-
-  }
-
+class UserService {
+  constructor() {}
 
   async create(data) {
-    const {name, lastname, email} = data;
-    const newUser = {
-      id: faker.datatype.uuid(),
-      name,
-      lastname,
-      email
-    }
-    this.users.push(newUser);
+    const newUser = await models.User.create(data);
     return newUser;
   }
 
+  async find() {
+    const rta = await models.User.findAll();
+    return rta;
+  }
+
   async findOne(id) {
-    const user = this.users.find(item => item.id === id);
+    const user = await models.User.findByPk(id);
     if (!user) {
-     throw boom.notFound('user not found');
+      throw boom.notFound('user not found');
     }
     return user;
   }
 
   async update(id, changes) {
-    const index = this.users.findIndex(item => item.id === id);
-    if (index === -1) {
-      throw boom.notFound('product not found');
-    }
-    const user = this.users[index];
-    this.users[index] = {
-      ...user,
-      ...changes
-    };
-    return this.users[index];
+    const user = await this.findOne(id);
+    const rta = await user.update(changes);
+    return rta;
   }
 
   async delete(id) {
-  const index = this.users.findIndex(item => item.id === id);
-  if (index === -1) {
-    throw boom.notFound('user not found');
+    const user = await this.findOne(id);
+    await user.destroy();
+    return { id };
   }
-  this.users.splice(index, 1);
-  return { id };
-  }
-};
+}
 
+module.exports = UserService;
 
-module.exports = UsersService;
