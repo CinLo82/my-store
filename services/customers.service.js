@@ -13,15 +13,17 @@ class CustomerService {
   }
 
   async findOne(id) {
-    const customer = await models.Customer.findByPk(id);
-    if (!customer) {
-      throw boom.notFound('user not found');
+    const user = await models.Customer.findByPk(id);
+    if (!user) {
+      throw boom.notFound('customer not found');
     }
-    return customer;
+    return user;
   }
 
   async create(data) {
-    const newCustomer = await models.Customer.create(data);
+    const newCustomer = await models.Customer.create(data, {
+      include: ['user']
+    });
     return newCustomer;
   }
 
